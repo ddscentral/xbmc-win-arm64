@@ -137,6 +137,10 @@ cleanup:
 */
 bool win32_exception::write_stacktrace(EXCEPTION_POINTERS* pEp)
 {
+#ifdef _M_ARM64
+// TODO: ARM64 stacktrace
+  return true;
+#else  
   #define STACKWALK_MAX_NAMELEN 1024
 
   std::string dumpFileName, strOutput;
@@ -274,6 +278,7 @@ cleanup:
     FreeLibrary(hDbgHelpDll);
 
   return returncode;
+#endif
 }
 
 bool win32_exception::ShouldHook()
