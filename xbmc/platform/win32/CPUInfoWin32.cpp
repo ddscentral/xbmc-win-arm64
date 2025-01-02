@@ -126,6 +126,7 @@ CCPUInfoWin32::CCPUInfoWin32()
 
   int CPUInfo[4] = {}; // receives EAX, EBX, ECD and EDX in that order
 
+#ifndef _M_ARM64
   __cpuid(CPUInfo, 0);
   int MaxStdInfoType = CPUInfo[0];
 
@@ -162,6 +163,7 @@ CCPUInfoWin32::CCPUInfoWin32()
     if (CPUInfo[CPUINFO_EDX] & CPUID_80000001_EDX_3DNOWEXT)
       m_cpuFeatures |= CPU_FEATURE_3DNOWEXT;
   }
+#endif
 
   // Set MMX2 when SSE is present as SSE is a superset of MMX2 and Intel doesn't set the MMX2 cap
   if (m_cpuFeatures & CPU_FEATURE_SSE)
