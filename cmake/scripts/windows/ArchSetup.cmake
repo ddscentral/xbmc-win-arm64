@@ -23,6 +23,11 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
   set(SDK_TARGET_ARCH x64)
 endif()
 
+# override for ARM64
+if(CMAKE_GENERATOR_PLATFORM STREQUAL arm64)
+  set(ARCH arm64)
+  set(SDK_TARGET_ARCH arm64) 
+endif()
 
 # -------- Paths (mainly for find_package) ---------
 
