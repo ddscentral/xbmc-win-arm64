@@ -135,11 +135,11 @@ public:
   virtual bool Rename(const CURL& url, const CURL& urlnew) { return false; }
   virtual bool SetHidden(const CURL& url, bool hidden) { return false; }
 
-  virtual int IoControl(EIoControl request, void* param) { return -1; }
+  virtual int IoControl(IOControl request, void* param) { return -1; }
 
   virtual const std::string GetProperty(XFILE::FileProperty type, const std::string &name = "") const
   {
-    return type == XFILE::FILE_PROPERTY_CONTENT_TYPE ? "application/octet-stream" : "";
+    return type == XFILE::FileProperty::CONTENT_TYPE ? "application/octet-stream" : "";
   };
 
   virtual const std::vector<std::string> GetPropertyValues(XFILE::FileProperty type, const std::string &name = "") const

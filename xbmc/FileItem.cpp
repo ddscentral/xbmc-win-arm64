@@ -567,7 +567,7 @@ void CFileItem::Initialize()
   m_dwSize = 0;
   m_bIsParentFolder = false;
   m_bIsShareOrDrive = false;
-  m_iDriveType = CMediaSource::SOURCE_TYPE_UNKNOWN;
+  m_iDriveType = SourceType::UNKNOWN;
   m_lStartOffset = 0;
   m_lStartPartNumber = 1;
   m_lEndOffset = 0;
@@ -620,7 +620,6 @@ void CFileItem::Reset()
   SetInvalid();
 }
 
-// do not archive dynamic path
 void CFileItem::Archive(CArchive& ar)
 {
   CGUIListItem::Archive(ar);
@@ -630,8 +629,9 @@ void CFileItem::Archive(CArchive& ar)
     ar << m_bIsParentFolder;
     ar << m_bLabelPreformatted;
     ar << m_strPath;
+    ar << m_strDynPath;
     ar << m_bIsShareOrDrive;
-    ar << m_iDriveType;
+    ar << static_cast<int>(m_iDriveType);
     ar << m_dateTime;
     ar << m_dwSize;
     ar << m_strDVDLabel;
@@ -685,8 +685,11 @@ void CFileItem::Archive(CArchive& ar)
     ar >> m_bIsParentFolder;
     ar >> m_bLabelPreformatted;
     ar >> m_strPath;
+    ar >> m_strDynPath;
     ar >> m_bIsShareOrDrive;
-    ar >> m_iDriveType;
+    int dtype;
+    ar >> dtype;
+    m_iDriveType = static_cast<SourceType>(dtype);
     ar >> m_dateTime;
     ar >> m_dwSize;
     ar >> m_strDVDLabel;
@@ -774,7 +777,7 @@ void CFileItem::ToSortable(SortItem &sortable, Field field) const
       sortable[FieldSize] = m_dwSize;
       break;
     case FieldDriveType:
-      sortable[FieldDriveType] = m_iDriveType;
+      sortable[FieldDriveType] = static_cast<int>(m_iDriveType);
       break;
     case FieldStartOffset:
       sortable[FieldStartOffset] = m_lStartOffset;
@@ -1158,12 +1161,12 @@ bool CFileItem::IsBluray() const
 
 bool CFileItem::IsDVD() const
 {
-  return URIUtils::IsDVD(m_strPath) || m_iDriveType == CMediaSource::SOURCE_TYPE_OPTICAL_DISC;
+  return URIUtils::IsDVD(m_strPath) || m_iDriveType == SourceType::OPTICAL_DISC;
 }
 
 bool CFileItem::IsOnDVD() const
 {
-  return URIUtils::IsOnDVD(m_strPath) || m_iDriveType == CMediaSource::SOURCE_TYPE_OPTICAL_DISC;
+  return URIUtils::IsOnDVD(m_strPath) || m_iDriveType == SourceType::OPTICAL_DISC;
 }
 
 bool CFileItem::IsNfs() const
@@ -1208,7 +1211,7 @@ bool CFileItem::IsVirtualDirectoryRoot() const
 
 bool CFileItem::IsRemovable() const
 {
-  return IsOnDVD() || MUSIC::IsCDDA(*this) || m_iDriveType == CMediaSource::SOURCE_TYPE_REMOVABLE;
+  return IsOnDVD() || MUSIC::IsCDDA(*this) || m_iDriveType == SourceType::REMOVABLE;
 }
 
 bool CFileItem::IsReadOnly() const
