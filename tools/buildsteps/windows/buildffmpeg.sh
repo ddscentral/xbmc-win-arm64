@@ -27,6 +27,9 @@ do_getFFmpegConfig() {
   elif [ "$ARCH" == "arm" ]; then
     FFMPEG_TARGET_OS=mingw32
     do_addOption "--cpu=armv7"
+  elif [ "$ARCH" == "arm64" ]; then
+    FFMPEG_TARGET_OS=mingw32
+    do_addOption "--cpu=armv8-a"	
   fi
 
   # add options for static modplug
@@ -92,6 +95,8 @@ elif [ "$ARCH" = "x86" ]; then
   FFMPEG_TARGET_OS=win32
 elif [ "$ARCH" = "arm" ]; then
   FFMPEG_TARGET_OS=win32
+elif [ "$ARCH" = "arm64" ]; then
+  FFMPEG_TARGET_OS=mingw32
 fi
 
 export CFLAGS=""
@@ -121,7 +126,7 @@ do_print_status "$LIBNAME-$VERSION (${TRIPLET})" "$blue_color" "Configuring"
 [[ -z "$extra_cflags" ]] && extra_cflags=-DPTW32_STATIC_LIB
 [[ -z "$extra_ldflags" ]] && extra_ldflags=-static-libgcc
 
-$LOCALSRCDIR/configure --target-os=$FFMPEG_TARGET_OS --prefix=$FFMPEGDESTDIR --arch=$ARCH \
+/bin/sh $LOCALSRCDIR/configure --target-os=$FFMPEG_TARGET_OS --prefix=$FFMPEGDESTDIR --arch=$ARCH \
   $FFMPEG_OPTS_SHARED \
   --extra-cflags="$extra_cflags" --extra-ldflags="$extra_ldflags"
 
