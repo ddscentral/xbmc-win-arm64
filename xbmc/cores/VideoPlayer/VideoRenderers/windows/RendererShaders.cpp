@@ -11,7 +11,7 @@
 #include "DVDCodecs/Video/DXVA.h"
 #include "rendering/dx/RenderContext.h"
 #include "utils/CPUInfo.h"
-#ifndef _M_ARM
+#if !defined(_M_ARM) && !defined(_M_ARM64)
   #include "utils/gpu_memcpy_sse4.h"
 #endif
 #include "utils/log.h"
