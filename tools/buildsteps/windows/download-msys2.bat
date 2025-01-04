@@ -55,7 +55,7 @@ for %%b in (%*) do (
 
 :: msys2 announced end of 32bit active support on 2020-05-17
 if %PROCESSOR_ARCHITECTURE%=="x86" (
-	echo ERROR: msys2 is not available for 32bit OS
+    echo ERROR: msys2 is not available for 32bit OS
         exit /B 1
 )
 set msysfile=msys2-base-%arch%-%msysver%.tar.xz
@@ -69,7 +69,7 @@ if %opt%==mintty (
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
 if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO minttySettings
-	if not exist %downloaddir% mkdir %downloaddir%
+    if not exist %downloaddir% mkdir %downloaddir%
 
 :download
 if exist "%downloaddir%\%msysfile%" (
@@ -105,15 +105,15 @@ if exist "%downloaddir%\%msysfile%" (
     echo -------------------------------------------------------------------------------
     echo.- Installing msys2 basic system
     echo -------------------------------------------------------------------------------
-	%unpack_exe% x %downloaddir%\%msysfile% -so 2>NUL | %unpack_exe% x -aoa -si -ttar -o%instdir% >NUL 2>NUL
-	)
+    %unpack_exe% x %downloaddir%\%msysfile% -so 2>NUL | %unpack_exe% x -aoa -si -ttar -o%instdir% >NUL 2>NUL
+    )
 
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
-	echo -------------------------------------------------------------------------------
-	echo.- Installing msys2 basic system failed,
-	echo -------------------------------------------------------------------------------
-	exit /B 1
-	)
+    echo -------------------------------------------------------------------------------
+    echo.- Installing msys2 basic system failed,
+    echo -------------------------------------------------------------------------------
+    exit /B 1
+    )
 
 :minttySettings
 if exist "%instdir%\%msys2%\home\%USERNAME%\.minttyrc" GOTO updatemirrors
@@ -246,17 +246,17 @@ if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%inst
     echo.%instdir%\downloads\        /downloads
     echo.%instdir%\locals\win32\     /local32
     echo.%instdir%\locals\x64\       /local64
-	echo.%instdir%\locals\arm64\     /localarm64
+    echo.%instdir%\locals\arm64\     /localarm64
     echo.%instdir%\%msys2%\mingw32\  /mingw32
     echo.%instdir%\%msys2%\mingw64\  /mingw64
-	echo.%instdir%\%msys2%\clangarm64\ /clangarm64
+    echo.%instdir%\%msys2%\clangarm64\ /clangarm64
     echo.%instdir%\downloads2\       /var/cache/pacman/pkg
     echo.%instdir%\win32\            /depends/win32
     echo.%instdir%\x64\              /depends/x64
     echo.%instdir%\win10-arm\        /depends/win10-arm
     echo.%instdir%\win10-win32\      /depends/win10-win32
     echo.%instdir%\win10-x64\        /depends/win10-x64
-	echo.%instdir%\arm64\            /depends/arm64
+    echo.%instdir%\arm64\            /depends/arm64
     echo.%instdir%\..\..\            /xbmc
 )>>%instdir%\%msys2%\etc\fstab.
 
