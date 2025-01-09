@@ -439,7 +439,7 @@ if exist %instdir%\locals\arm64\etc\profile.local GOTO loadGasPreproc
         echo.# package installation prefix
         echo.LOCALDESTDIR=/localarm64
         echo.export LOCALBUILDDIR LOCALDESTDIR
-        )>>%instdir%\locals\x64\etc\profile.local
+        )>>%instdir%\locals\arm64\etc\profile.local
     )
 
 :loadGasPreproc
