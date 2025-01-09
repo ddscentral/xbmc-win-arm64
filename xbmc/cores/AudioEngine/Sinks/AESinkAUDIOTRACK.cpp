@@ -815,23 +815,34 @@ unsigned int CAESinkAUDIOTRACK::AddPackets(uint8_t **data, unsigned int frames, 
   if (!IsInitialized())
     return INT_MAX;
 
-  // If the sink did not move twice the buffer size in time it was opened
+  // If the sink did not move twice the buffer size at least 400 ms in time it was opened
   // take action. Some sinks open with e.g. 128 ms nicely but under the
   // hood need a bit more samples to start moving on sink start.
-  // Simple equation: N x stime packages in ms > 2 configured audiotrack_buffer in ms
+  // Simple equation: N x stime packages in ms > 400 ms or 2 buffer sizes in ms
   // will result in the error condition triggering.
 
   const bool isRawPt = m_passthrough && !m_info.m_wantsIECPassthrough;
+  bool forceBlock = false;
   if (!isRawPt)
   {
-    const double max_stuck_delay_ms = m_audiotrackbuffer_sec_orig * 2000.0;
+    const double max_stuck_delay_ms = std::max((m_audiotrackbuffer_sec_orig * 2000.0), 400.0);
     const double stime_ms = 1000.0 * frames / m_format.m_sampleRate;
 
-    if (m_superviseAudioDelay && (m_stuckCounter * stime_ms > max_stuck_delay_ms))
+    if (m_superviseAudioDelay)
     {
-      CLog::Log(LOGERROR, "Sink got stuck with {:f} ms - ask AE for reopening", max_stuck_delay_ms);
-      usleep(max_stuck_delay_ms * 1000);
-      return INT_MAX;
+      if (m_stuckCounter * stime_ms > max_stuck_delay_ms)
+      {
+        CLog::Log(LOGERROR, "Sink got stuck with {:f} ms - ask AE for reopening",
+                  max_stuck_delay_ms);
+        usleep(max_stuck_delay_ms * 1000);
+        return INT_MAX;
+      }
+      else if (m_stuckCounter * stime_ms >= m_audiotrackbuffer_sec_orig * 1000.0)
+      {
+        CLog::LogF(LOGDEBUG, "Sink filling too fast - throttleing - Fillstate: {} ms!",
+                   (m_stuckCounter * stime_ms));
+        forceBlock = true;
+      }
     }
   }
 
@@ -942,6 +953,31 @@ unsigned int CAESinkAUDIOTRACK::AddPackets(uint8_t **data, unsigned int frames, 
         extra_sleep_ms = 0.0;
         CLog::Log(LOGDEBUG, "Resetting pause bursts as buffer level was reached! (1)");
       }
+    }
+  }
+  else
+  {
+    // waiting should only be done if sink is not run dry
+    double period_time = m_format.m_frames / static_cast<double>(m_sink_sampleRate);
+    if (m_delay >= (m_audiotrackbuffer_sec - period_time))
+    {
+      double time_should_ms = 1000.0 * written_frames / m_format.m_sampleRate;
+      double time_off = time_should_ms - time_to_add_ms;
+      if (time_off > 0)
+        usleep(time_off * 500); // sleep half the error on average away
+    }
+  }
+  if (forceBlock)
+  {
+    // Sink consumes too fast - block the frames minus they needed to add
+    // update time to add, so that above else case won't make us sleep twice the amount for the
+    // superviseaudiodelay use-case.
+    time_to_add_ms = 1000.0 * (CurrentHostCounter() - startTime) / CurrentHostFrequency();
+    double extra_sleep_ms = (1000.0 * frames / m_format.m_sampleRate) - time_to_add_ms;
+    if (extra_sleep_ms > 0.0)
+    {
+      CLog::LogF(LOGDEBUG, "Extra Sleeping for {:f}", extra_sleep_ms);
+      usleep(extra_sleep_ms * 1000);
     }
   }
   return written_frames;
