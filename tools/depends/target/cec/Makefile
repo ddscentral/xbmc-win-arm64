@@ -28,7 +28,7 @@ $(PLATFORM): $(DEPS) | $(TARBALLS_LOCATION)/$(ARCHIVE).$(HASH_TYPE)
 	cd $(PLATFORM); patch -p1 -i ../003-all-remove_git_info.patch
 	cd $(PLATFORM); patch -p1 -i ../004-win-remove_32bit_timet.patch
 	cd $(PLATFORM); patch -p1 -i ../005-win-pdbstatic.patch
-    cd $(PLATFORM); patch -p1 -i ../006-win-arm64-support.patch
+	cd $(PLATFORM); patch -p1 -i ../006-win-arm64-support.patch
 	cd $(PLATFORM)/build; $(CMAKE) ${CMAKE_OPTIONS} ..
 
 $(LIBDYLIB): $(PLATFORM)
