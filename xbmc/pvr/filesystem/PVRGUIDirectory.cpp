@@ -16,6 +16,7 @@
 #include "input/WindowTranslator.h"
 #include "pvr/PVRConstants.h" // PVR_CLIENT_INVALID_UID
 #include "pvr/PVRManager.h"
+#include "pvr/PVRPlaybackState.h"
 #include "pvr/addons/PVRClient.h"
 #include "pvr/addons/PVRClients.h"
 #include "pvr/channels/PVRChannel.h"
@@ -65,6 +66,11 @@ bool CPVRGUIDirectory::SupportsWriteFileOperations() const
 
   const std::string filename = m_url.GetFileName();
   return URIUtils::IsPVRRecording(filename);
+}
+
+bool CPVRGUIDirectory::Resolve(CFileItem& item)
+{
+  return CServiceBroker::GetPVRManager().PlaybackState()->OnPreparePlayback(item);
 }
 
 namespace
@@ -762,7 +768,11 @@ bool CPVRGUIDirectory::GetChannelsDirectory(CFileItemList& results) const
           }
         }
 
-        results.Add(std::make_shared<CFileItem>(groupMember));
+        const auto item{std::make_shared<CFileItem>(groupMember)};
+        if (dateAdded)
+          item->SetProperty("hideable", true);
+
+        results.Add(std::move(item));
       }
       return true;
     }

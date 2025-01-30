@@ -19,6 +19,7 @@
 #include "pvr/channels/PVRChannel.h"
 #include "pvr/channels/PVRChannelGroupsContainer.h"
 #include "pvr/epg/EpgInfoTag.h"
+#include "pvr/guilib/PVRGUIActionsChannels.h"
 #include "pvr/guilib/PVRGUIActionsEPG.h"
 #include "pvr/guilib/PVRGUIActionsPlayback.h"
 #include "pvr/guilib/PVRGUIActionsRecordings.h"
@@ -32,6 +33,7 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/URIUtils.h"
+#include "video/guilib/VideoPlayActionProcessor.h"
 
 #include <memory>
 #include <string>
@@ -83,6 +85,7 @@ DECL_STATICCONTEXTMENUITEM(RenameSearch);
 DECL_STATICCONTEXTMENUITEM(ChooseIconForSearch);
 DECL_STATICCONTEXTMENUITEM(DuplicateSearch);
 DECL_STATICCONTEXTMENUITEM(DeleteSearch);
+DECL_STATICCONTEXTMENUITEM(HideChannel);
 
 class PVRClientMenuHook : public IContextMenuItem
 {
@@ -176,8 +179,13 @@ bool PlayRecording::IsVisible(const CFileItem& item) const
 
 bool PlayRecording::Execute(const CFileItemPtr& item) const
 {
-  return CServiceBroker::GetPVRManager().Get<PVR::GUI::Playback>().PlayRecording(
-      *item, true /* bCheckResume */);
+  const std::shared_ptr<CPVRRecording> recording{
+      CServiceBroker::GetPVRManager().Recordings()->GetRecordingForEpgTag(item->GetEPGInfoTag())};
+  if (!recording)
+    return false;
+
+  KODI::VIDEO::GUILIB::CVideoPlayActionProcessor proc{std::make_shared<CFileItem>(recording)};
+  return proc.ProcessDefaultAction();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -432,8 +440,8 @@ bool UndeleteRecording::Execute(const CFileItemPtr& item) const
 bool DeleteWatchedRecordings::IsVisible(const CFileItem& item) const
 {
   // recordings folder?
-  if (item.m_bIsFolder && !item.IsParentFolder())
-    return CPVRRecordingsPath(item.GetPath()).IsValid();
+  if (item.m_bIsFolder && !item.IsParentFolder() && CPVRRecordingsPath(item.GetPath()).IsValid())
+    return item.GetProperty("watchedepisodes").asInteger() > 0;
 
   return false;
 }
@@ -767,6 +775,19 @@ bool DeleteSearch::Execute(const std::shared_ptr<CFileItem>& item) const
   return CServiceBroker::GetPVRManager().Get<PVR::GUI::EPG>().DeleteSavedSearch(*item);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Hide channel
+
+bool HideChannel::IsVisible(const CFileItem& item) const
+{
+  return item.IsPVRChannel() && item.GetProperty("hideable").asBoolean(false);
+}
+
+bool HideChannel::Execute(const std::shared_ptr<CFileItem>& item) const
+{
+  return CServiceBroker::GetPVRManager().Get<PVR::GUI::Channels>().HideChannel(*item);
+}
+
 } // namespace CONTEXTMENUITEM
 
 CPVRContextMenuManager& CPVRContextMenuManager::GetInstance()
@@ -802,6 +823,7 @@ CPVRContextMenuManager::CPVRContextMenuManager()
         std::make_shared<CONTEXTMENUITEM::ChooseIconForSearch>(19284), /* Choose icon */
         std::make_shared<CONTEXTMENUITEM::DuplicateSearch>(19355), /* Duplicate */
         std::make_shared<CONTEXTMENUITEM::DeleteSearch>(117), /* Delete */
+        std::make_shared<CONTEXTMENUITEM::HideChannel>(19054), /* Hide channel */
     })
 {
 }

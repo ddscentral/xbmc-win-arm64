@@ -9362,6 +9362,7 @@ msgid "Deinterlace video"
 msgstr ""
 
 #: xbmc/video/dialogs/GUIDialogVideoSettings.cpp
+#: addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
 msgctxt "#16038"
 msgid "Deinterlace method"
 msgstr ""
@@ -9774,6 +9775,7 @@ msgstr ""
 
 #. label for PVR backend name in system information's PVR section
 #: xbmc/windows/GUIWindowSystemInfo.cpp
+#: addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
 msgctxt "#19012"
 msgid "PVR backend"
 msgstr ""
@@ -10051,7 +10053,8 @@ msgctxt "#19053"
 msgid "Recording information"
 msgstr ""
 
-#. header label for hide channel confirmation message box
+#. Header label for hide channel confirmation message box and context menu item label
+#: xbmc/pvr/PVRContextMenus.cpp
 #: xbmc/pvr/guilib/PVRGUIActionsChannels.cpp
 msgctxt "#19054"
 msgid "Hide channel"
@@ -13638,8 +13641,8 @@ msgid "Movie plot"
 msgstr ""
 
 #. Label for context menu entry to start playback of a part of a video stack
-#: xbmc/video/guilib/VideoSelectActionProcessor.cpp
-#: xbmc/video/windows/GUIWindowVideoBase.cpp
+#: xbmc/video/guilib/VideoPlayActionProcessor.cpp
+#: xbmc/video/ContextMenus.h
 msgctxt "#20324"
 msgid "Play part..."
 msgstr ""
@@ -14411,6 +14414,7 @@ msgstr ""
 
 #. Used in smart playlists to select items based on the HDR type (HDR10, HLG, Dolbyvision)
 #: xbmc/playlists/SmartPlayList.cpp
+#: addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
 msgctxt "#20474"
 msgid "HDR type"
 msgstr ""
@@ -14925,6 +14929,7 @@ msgid "Audio codec"
 msgstr ""
 
 #: xbmc/playlists/SmartPlaylist.cpp
+#: addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
 msgctxt "#21447"
 msgid "Audio language"
 msgstr ""
@@ -15655,6 +15660,7 @@ msgid "GPU temperature:"
 msgstr ""
 
 #: xbmc/windows/GUIWindowSystemInfo.cpp
+#: addons/skin.estuary/xml/DialogPlayerProcessInfo.xml
 msgctxt "#22011"
 msgid "CPU temperature:"
 msgstr ""
@@ -15796,8 +15802,8 @@ msgid "Activate teletext"
 msgstr ""
 
 #. Label for disc stack part and number
-#: xbmc/video/guilib/VideoSelectActionProcessor.cpp
-#: xbmc/video/VideoUtils.cpp
+#: xbmc/video/guilib/VideoPlayActionProcessor.cpp
+#: xbmc/video/gui/VideoGUIUtils.cpp
 msgctxt "#23051"
 msgid "Part {0:d}"
 msgstr ""

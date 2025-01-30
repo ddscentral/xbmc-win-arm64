@@ -69,6 +69,9 @@ bool CVideoInfo::IsVisible(const CFileItem& item) const
   if (item.m_bIsFolder)
     return false;
 
+  if (item.IsPVRRecording())
+    return false; // pvr recordings have its own implementation for this
+
   const auto* tag{item.GetVideoInfoTag()};
   return tag && tag->m_type == MediaTypeNone && !tag->IsEmpty() && VIDEO::IsVideo(item);
 }
@@ -244,13 +247,12 @@ enum class PlayMode
   PLAY,
   PLAY_USING,
   PLAY_VERSION_USING,
+  PLAY_STACK_PART,
   RESUME,
 };
 
 void SetPathAndPlay(const std::shared_ptr<CFileItem>& item, PlayMode mode)
 {
-  item->SetProperty("check_resume", false);
-
   if (item->IsLiveTV()) // pvr tv or pvr radio?
   {
     g_application.PlayMedia(*item, "", PLAYLIST::Id::TYPE_VIDEO);
@@ -286,10 +288,14 @@ void SetPathAndPlay(const std::shared_ptr<CFileItem>& item, PlayMode mode)
     KODI::VIDEO::GUILIB::CVideoPlayActionProcessor proc{itemCopy};
     if (mode == PlayMode::PLAY_USING || mode == PlayMode::PLAY_VERSION_USING)
       proc.SetChoosePlayer();
+    else if (mode == PlayMode::PLAY_STACK_PART)
+      proc.SetChooseStackPart();
 
     if (mode == PlayMode::RESUME && (itemCopy->GetStartOffset() == STARTOFFSET_RESUME ||
                                      VIDEO::UTILS::GetItemResumeInformation(*item).isResumable))
       proc.ProcessAction(VIDEO::GUILIB::ACTION_RESUME);
+    else if (mode == PlayMode::PLAY_STACK_PART)
+      proc.ProcessDefaultAction();
     else // all other modes are actually PLAY
       proc.ProcessAction(VIDEO::GUILIB::ACTION_PLAY_FROM_BEGINNING);
   }
@@ -353,6 +359,18 @@ bool CVideoPlayUsing::Execute(const std::shared_ptr<CFileItem>& itemIn) const
 {
   const auto item{std::make_shared<CFileItem>(itemIn->GetItemToPlay())};
   SetPathAndPlay(item, PlayMode::PLAY_USING);
+  return true;
+}
+
+bool CVideoPlayStackPart::IsVisible(const CFileItem& item) const
+{
+  return !item.IsParentFolder() && item.IsStack();
+}
+
+bool CVideoPlayStackPart::Execute(const std::shared_ptr<CFileItem>& itemIn) const
+{
+  const auto item{std::make_shared<CFileItem>(itemIn->GetItemToPlay())};
+  SetPathAndPlay(item, PlayMode::PLAY_STACK_PART);
   return true;
 }
 
