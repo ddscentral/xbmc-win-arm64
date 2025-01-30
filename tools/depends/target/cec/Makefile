@@ -4,7 +4,8 @@ DEPS = ../../Makefile.include Makefile CEC-VERSION ../../download-files.include 
                             002-all-libceccmakelists.patch \
                             003-all-remove_git_info.patch \
                             004-win-remove_32bit_timet.patch \
-                            005-win-pdbstatic.patch
+                            005-win-pdbstatic.patch \
+                            006-win-arm64-support.patch
 
 LIBDYLIB=$(PLATFORM)/build/src/$(LIBNAME)/$(BYPRODUCT)
 ifeq (darwin, $(findstring darwin, $(HOST)))
@@ -27,6 +28,7 @@ $(PLATFORM): $(DEPS) | $(TARBALLS_LOCATION)/$(ARCHIVE).$(HASH_TYPE)
 	cd $(PLATFORM); patch -p1 -i ../003-all-remove_git_info.patch
 	cd $(PLATFORM); patch -p1 -i ../004-win-remove_32bit_timet.patch
 	cd $(PLATFORM); patch -p1 -i ../005-win-pdbstatic.patch
+    cd $(PLATFORM); patch -p1 -i ../006-win-arm64-support.patch
 	cd $(PLATFORM)/build; $(CMAKE) ${CMAKE_OPTIONS} ..
 
 $(LIBDYLIB): $(PLATFORM)
