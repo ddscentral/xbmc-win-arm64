@@ -64,7 +64,11 @@ set WORKSPACE=%base_dir%\kodi-build.%TARGET_PLATFORM%
   MKDIR %WORKSPACE%
   PUSHD %WORKSPACE%
 
-  cmake.exe -G "%cmakeGenerator%" -A %cmakeArch% -T host=x64 %cmakeProps% %base_dir%
+  if %cmakeArch%==arm64 (
+    cmake.exe -G "%cmakeGenerator%" -A %cmakeArch% -T host=x64 %cmakeProps% %base_dir%
+  ) ELSE (
+    cmake.exe -G "%cmakeGenerator%" -A %cmakeArch% -T host=x64 %cmakeProps% %base_dir%
+  )
   IF %errorlevel%==1 (
     set DIETEXT="%APP_NAME%.EXE failed to build!"
     goto DIE
