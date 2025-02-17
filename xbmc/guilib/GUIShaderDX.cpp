@@ -280,7 +280,7 @@ void CGUIShaderDX::SetViewPort(D3D11_VIEWPORT viewPort)
 }
 
 #if defined(_M_ARM64) && defined(_XM_ARM_NEON_INTRINSICS_) && !defined(_XM_NO_INTRINSICS_)
-inline XMVECTOR set_vector(float l0, float l1, float l2, float l3)
+inline XMVECTOR initialize_vector(float l0, float l1, float l2, float l3)
 {
     XMVECTOR ret{};
     ret = vsetq_lane_f32(l0, ret, 0);
@@ -296,7 +296,7 @@ void CGUIShaderDX::Project(float &x, float &y, float &z)
 #if defined(_XM_SSE_INTRINSICS_) && !defined(_XM_NO_INTRINSICS_)
   XMVECTOR vLocation = { x, y, z };
 #elif defined(_M_ARM64) && defined(_XM_ARM_NEON_INTRINSICS_) && !defined(_XM_NO_INTRINSICS_)
-  XMVECTOR vlocation = set_vector(x, y, z, 0.0f);  
+  XMVECTOR vlocation = initialize_vector(x, y, z, 0.0f);  
 #elif defined(_XM_ARM_NEON_INTRINSICS_) && !defined(_XM_NO_INTRINSICS_)
   XMVECTOR vLocation = { x, y };
 #endif
