@@ -1,1 +1,1 @@
-binary-addons https://github.com/xbmc/repo-binary-addons.git Piers
+binary-addons https://github.com/ddscentral/kodi-repo-binary-addons-win-arm64 Piers
